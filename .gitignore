@@ -1,0 +1,4 @@
+*.csv
+!anonymized.csv
+*.sqlite
+__pycache__/
