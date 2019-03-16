@@ -1,0 +1,4 @@
+dn: ou=PeopleOU,dc=ad,dc=dcs,dc=gla,dc=ac,dc=uk
+objectClass: organizationalUnit
+objectClass: top
+ou: PeopleOU

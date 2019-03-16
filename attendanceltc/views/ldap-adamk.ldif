@@ -1,0 +1,16 @@
+dn: uid=adamk,ou=PeopleOU,dc=ad,dc=dcs,dc=gla,dc=ac,dc=uk
+objectClass: top
+objectClass: account
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: adamk
+uid: adamk
+uidNumber: 16859
+gidNumber: 100
+homeDirectory: /home/adamk
+loginShell: /bin/bash
+gecos: adamk
+userPassword: {crypt}x
+shadowLastChange: 0
+shadowMax: 0
+shadowWarning: 0
