@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 from .views.api import api
+from .views.school_admin_view import school_admin_view
 from .models.shared import db
 
 app = Flask(__name__)
@@ -10,6 +11,7 @@ with app.app_context():
 	db.create_all()
 
 app.register_blueprint(api)
+app.register_blueprint(school_admin_view)
 
 @app.errorhandler(404)
 def not_found(error):

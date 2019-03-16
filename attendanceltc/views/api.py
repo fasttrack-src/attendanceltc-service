@@ -17,8 +17,9 @@ def add_student(row):
 
 	# TODO: change these values when feed updates
 	email = uid + lastname[0].capitalize() + "@student.gla.ac.uk"
-	barcode = uid
-	tier4 = True
+	
+	barcode = row["Barcode"]
+	tier4 = (row["CAS Number"] != "")
 
 	student = Student(id=uid, firstname=firstname, lastname=lastname,
 		year=year, email=email, barcode=barcode, tier4=tier4)
@@ -39,9 +40,6 @@ def add_course_component(course, component):
 	return component
 
 def add_student_course_enrollment(student, component):
-	print("IMPORTING")
-	print(student, component)
-
 	e = Enrollment()
 	e.component = component
 	student.components.append(e)
