@@ -2,7 +2,7 @@ from .shared import db
 
 from sqlalchemy import PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
+
 
 class Enrollment(db.Model):
 	__tablename__ = 'enrollment'
@@ -16,6 +16,7 @@ class Enrollment(db.Model):
 
 	student = relationship("Student", back_populates="components")
 	component = relationship("CourseComponent", back_populates="students")
+
 
 class Student(db.Model):
 	__tablename__ = 'student'
