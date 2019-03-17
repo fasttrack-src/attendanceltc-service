@@ -12,33 +12,36 @@ school_admin_view = Blueprint('school_admin_view', __name__)
 @school_admin_view.route('/', methods=["GET"])
 def view_course():
 	
-	students = db.session.query(Course, Student) \
+	# Get student count per course
+	students_count = db.session.query(Course, Student) \
 			.with_entities(Course.id, Course.name, func.count(Student.id)) \
 			.join(Student.components, Enrollment.component, CourseComponent.course) \
 			.group_by(Course.id).order_by(Course.id).all()
 
-	tier4_students = db.session.query(Course, Student) \
+	# Get Tier 4 student count per course
+	tier4_count = db.session.query(Course, Student) \
 			.with_entities(Course.id, Course.name, func.count(Student.id)) \
 			.join(Student.components, Enrollment.component, CourseComponent.course) \
 			.filter(Student.tier4).group_by(Course.id) \
 			.order_by(Course.id).all()
 
+	# Create the context for the render template, keyed by
+	# (course_id, course_name) and valued by [student_count,
+	# tier4_count]
 	result = OrderedDict()
 
-	for student in students:
-		courseid = student[0]
-		coursename = student[1]
-		no_students = student[2]
+	# First, go through the student count query. We will assume
+	# the course has no tier 4 students.
+	for student in students_count:
+		course_id, course_name, student_count = student
+		
+		result[(course_id, course_name)] = [student_count, 0]
 
-		result[(courseid, coursename)] = [no_students, 0]
+	# Now, go through the tier 4 query, updating the original dictionary
+	# as required.
+	for student in tier4_count:
+		course_id, course_name, tier4_count = student
 
-	for student in tier4_students:
-		courseid = student[0]
-		coursename = student[1]
-		no_tier4 = student[2]
-
-		result[(courseid, coursename)][1] = no_tier4
-
-	print(result)
+		result[(course_id, course_name)][-1] = tier4_count
 
 	return render_template("course_view.html", courses=result)

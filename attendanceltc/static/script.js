@@ -5,5 +5,6 @@ function filterCourses()
 		var name = $(this).find('td[id*=name]').html();
 
 		console.log(courseid, name);
+		// test
 	});
 }

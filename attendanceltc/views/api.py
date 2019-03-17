@@ -9,13 +9,14 @@ from attendanceltc.models.student import Student
 
 api = Blueprint('api', __name__)
 
+"""
 
 def read_config():
-    """
-    Looks up the name of the database, in the following order:
-    1. config file `$HOME/.config/bulk_ltc.conf`
-    2. config file `./bulk_ltc.conf`
-    """
+    #
+    #Looks up the name of the database, in the following order:
+    #1. config file `$HOME/.config/bulk_ltc.conf`
+    #2. config file `./bulk_ltc.conf`
+    #
     home_conf = os.path.join(os.environ["HOME"], ".config", "bulk_ltc.conf")
     local_conf = os.path.join(os.environ["PWD"], "bulk_ltc.conf")
     try:
@@ -95,7 +96,7 @@ def authenticate_with_dcs_ldap(username, password):
         except ldap.UNWILLING_TO_PERFORM as e:
             return False, "empty passwords are not OK or something else: " + str(e)
 
-
+"""
 
 def add_student(row):
 	uid = row["ID"]

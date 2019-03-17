@@ -43,58 +43,57 @@
 	</nav>
 
 	<main role="main" class="container">
-		<div class="table-wrapper">
-			<div class="table-title">
-				<div class="row">
-					<div class="col-sm-8"><h2>Courses in Department</h2></div>
-					<div class="col-sm-4">
-						<div class="search-box">
-							<input type="text" class="form-control" onkeyup="filterCourses()" placeholder="Search&hellip;">
-						</div>
+		<div class="table-title">
+			<div class="row">
+				<div class="col-sm-8"><h2>Courses in Department</h2></div>
+				<div class="col-sm-4">
+					<div class="search-box">
+						<input type="text" class="form-control" onkeyup="filterCourses()" placeholder="Search&hellip;">
 					</div>
 				</div>
 			</div>
-
-			<table id="courses-department" class="table table-striped table-bordered" style="width:100%">
-				<thead>
-					<tr>
-						<th>Course ID</th>
-						<th>Course Name</th>
-						<th>Students Enrolled</th>
-						<th>Tier 4 Students</th>
-						<th>Tier 4 Attendance Last Week</th>
-						<th>Tier 4 Attendance Last Month</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for (id, name), (students, tier4) in courses.items() %}
-					<tr>
-						<td id="{{ id }}-id">{{ id }}</td>
-						<td id="{{ id }}-name">{{ name }}</td>
-						<td id="{{ id }}-students">{{ students }}</td>
-						<td id="{{ id }}-tier4">{{ tier4 }}</td>
-						<td></td>
-						<td></td>
-					</tr>
-					{% endfor %}
-				</tbody>
-				<tfoot>
-					<tr>
-						<th>Course ID</th>
-						<th>Course Name</th>
-						<th>Students Enrolled</th>
-						<th>Tier 4 Students</th>
-						<th>Tier 4 Attendance Last Week</th>
-						<th>Tier 4 Attendance Last Month</th>
-					</tr>
-				</tfoot>
-			</table>
 		</div>
+
+		<table id="courses-department" class="table table-striped table-bordered" style="width:100%">
+			<thead>
+				<tr>
+					<th>Course ID</th>
+					<th>Course Name</th>
+					<th>Students Enrolled</th>
+					<th>Tier 4 Students</th>
+					<th>Tier 4 Attendance Last Week</th>
+					<th>Tier 4 Attendance Last Month</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for (id, name), (students, tier4) in courses.items() %}
+				<tr>
+					<td id="{{ id }}-id">{{ id }}</td>
+					<td id="{{ id }}-name">{{ name }}</td>
+					<td id="{{ id }}-students">{{ students }}</td>
+					<td id="{{ id }}-tier4">{{ tier4 }}</td>
+					<td></td>
+					<td></td>
+				</tr>
+				{% endfor %}
+			</tbody>
+			<tfoot>
+				<tr>
+					<th>Course ID</th>
+					<th>Course Name</th>
+					<th>Students Enrolled</th>
+					<th>Tier 4 Students</th>
+					<th>Tier 4 Attendance Last Week</th>
+					<th>Tier 4 Attendance Last Month</th>
+				</tr>
+			</tfoot>
+		</table>
+	
 
 	</main>
 
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-	<script src="{{ url_for('static', filename='scriptb.js') }}"></script>
+	<script src="/static/script.js"></script>
 	<script>window.jQuery || document.write('<script src="/docs/4.3/assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
 </body>
 </html>
