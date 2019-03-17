@@ -9,6 +9,7 @@ from attendanceltc.models.student import Student
 
 school_admin_view = Blueprint('school_admin_view', __name__)
 
+
 @school_admin_view.route('/', methods=["GET"])
 def view_course():
 	
@@ -44,4 +45,4 @@ def view_course():
 
 		result[(course_id, course_name)][-1] = tier4_count
 
-	return render_template("course_view.html", courses=result)
+	return render_template("school_admin_view.html", courses=result)

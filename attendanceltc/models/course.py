@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 
 from .student import Student, Enrollment
 
+
 class Course(db.Model):
 	__tablename__ = 'course'
 
@@ -14,6 +15,7 @@ class Course(db.Model):
 
 	def __str__(self):
 		return self.name + " (" + self.id + ")"
+
 
 class CourseComponent(db.Model):
 	__tablename__ = 'coursecomponent'

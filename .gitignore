@@ -2,3 +2,5 @@
 !anonymized.csv
 *.sqlite
 __pycache__/
+.idea/
+venv/
