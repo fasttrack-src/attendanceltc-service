@@ -4,7 +4,13 @@ from .views.school_admin_view import school_admin_view
 from .models.shared import db
 
 app = Flask(__name__)
-app.config.from_object('config')
+app.config.from_object('config_defaults')
+
+try:
+	app.config.from_envvar('ATTENDANCELTC_SERVICE_CONFIG')
+except:
+	print('No configuration file specified, loading with default settings...')
+
 db.init_app(app)
 
 with app.app_context():
