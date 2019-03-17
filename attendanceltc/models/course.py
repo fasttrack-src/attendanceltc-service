@@ -1,5 +1,5 @@
 from .shared import db
-from sqlalchemy import UniqueConstraint, ForeignKey
+from sqlalchemy import PrimaryKeyConstraint, ForeignKey
 from sqlalchemy.orm import relationship
 
 from .student import Student, Enrollment
@@ -19,10 +19,9 @@ class Course(db.Model):
 
 class CourseComponent(db.Model):
     __tablename__ = 'coursecomponent'
-    __table_args__ = (UniqueConstraint("name", "course_id"),)
+    __table_args__ = (PrimaryKeyConstraint("name", "course_id"),)
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
+    name = db.Column(db.String(150))
     course_id = db.Column(db.String(100), ForeignKey('course.id'))
 
     students = relationship("Enrollment", back_populates="component")

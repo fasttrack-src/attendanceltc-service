@@ -1,6 +1,6 @@
 from .shared import db
 
-from sqlalchemy import PrimaryKeyConstraint
+from sqlalchemy import PrimaryKeyConstraint, ForeignKeyConstraint
 from sqlalchemy.orm import relationship
 
 
@@ -8,14 +8,20 @@ class Enrollment(db.Model):
     __tablename__ = 'enrollment'
 
     __table_args__ = (
-        PrimaryKeyConstraint('student_id', 'coursecomponent_id'),
+        PrimaryKeyConstraint(
+            'student_id', 'coursecomponent_name', 'coursecomponent_course_id'),
+        ForeignKeyConstraint(
+            ['coursecomponent_name', 'coursecomponent_course_id'],
+            ['coursecomponent.name', 'coursecomponent.course_id'])
     )
 
     student_id = db.Column(db.String(150), db.ForeignKey('student.id'))
-    coursecomponent_id = db.Column(db.Integer, db.ForeignKey('coursecomponent.id'))
+    coursecomponent_name = db.Column(db.String(150))
+    coursecomponent_course_id = db.Column(db.String(100))
 
     student = relationship("Student", back_populates="components")
-    component = relationship("CourseComponent", back_populates="students")
+    component = relationship("CourseComponent", back_populates="students",
+                             foreign_keys=[coursecomponent_name, coursecomponent_course_id])
 
 
 class Student(db.Model):

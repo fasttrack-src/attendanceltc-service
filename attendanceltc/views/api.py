@@ -1,13 +1,17 @@
-from flask import Blueprint, jsonify, request
 import io
 import csv
 import time
+
+from flask import Blueprint, jsonify, request
 
 from attendanceltc.models.shared import db
 from attendanceltc.models.course import Course, CourseComponent, Enrollment
 from attendanceltc.models.student import Student
 
+from .shared import APIResponseMaker
+
 api = Blueprint('api', __name__)
+resp = APIResponseMaker()
 
 """
 
@@ -98,6 +102,7 @@ def authenticate_with_dcs_ldap(username, password):
 
 """
 
+
 def add_student(row):
     uid = row["ID"]
     firstname = row["First Name"]
@@ -106,15 +111,16 @@ def add_student(row):
 
     # TODO: change these values when feed updates
     email = uid + lastname[0].capitalize() + "@student.gla.ac.uk"
-    
+
     barcode = row["Barcode"]
     tier4 = (row["CAS Number"] != "")
 
     student = Student(id=uid, firstname=firstname, lastname=lastname,
-        year=year, email=email, barcode=barcode, tier4=tier4)
+                      year=year, email=email, barcode=barcode, tier4=tier4)
     db.session.add(student)
 
     return student
+
 
 def add_course(courseid, name):
     course = Course(id=courseid, name=name)
@@ -122,26 +128,30 @@ def add_course(courseid, name):
 
     return course
 
+
 def add_course_component(course, component):
     component = CourseComponent(name=component, course=course)
     db.session.add(component)
 
     return component
 
+
 def add_student_course_enrollment(student, component):
     e = Enrollment()
     e.component = component
     student.components.append(e)
+    db.session.add(e)
+
 
 def import_mycampus_feed():
     try:
         students = request.get_data().decode("utf-8")
     except:
-        return 400, {"message": "Request must contain a valid UTF-8 encoded CSV file."}
+        return resp.error("Request must contain a valid UTF-8 formatted CSV file.")
 
     buf = io.StringIO(students)
     reader = csv.DictReader(buf)
-    
+
     students = {}
     courses = {}
     components = {}
@@ -163,7 +173,7 @@ def import_mycampus_feed():
         if component != "LEC" and (courseid, compid) not in components:
             component = add_course_component(courses[courseid], compid)
             components[(courseid, compid)] = component
-        
+
         if guid not in students:
             student = add_student(row)
             students[guid] = student
@@ -179,29 +189,36 @@ def import_mycampus_feed():
     try:
         db.session.commit()
     except:
-        return 400, {"message": "There has been an error importing the data."}
+        return resp.error("There has been an error updating the database.")
 
-    print(students)
-    
-    obj = {"message": "Import successful.", "data": {
+    obj = {
+        "message": "Import successful",
         "students": len(students), "courses": len(courses),
         "course_components": len(components),
         "enrollments": len(student_enrollment)
-    }}
+    }
 
-    return 200, obj
+    print(resp)
+
+    resp.data(obj)
+
 
 @api.route('/students', methods=["POST"])
-def add_students():
+def import_students():
+    # This parameter describes the type of data we are expecting
+    # for student import.
     method = request.args.get('uploadType')
 
-    if method == "bulk" and request.mimetype == "text/csv":
-        status, message = import_mycampus_feed()
-        return jsonify(message), status
+    if method == "MATHS_STATS_CSV_1" and request.mimetype == "text/csv":
+        import_mycampus_feed()
+    else:
+        resp.error("Invalid uploadType specified.")
 
-    return jsonify({"message": "Invalid request."}), 400
+    return resp.get_response()
+
 
 @api.route('/test', methods=["GET"])
 def benchmark():
-    q = db.session.query(Student).with_entities(Student.firstname, Student.lastname).join(Student.components, Enrollment.component, CourseComponent.course).filter(Course.name == "MATHEMATICS 2P: GRAPHS AND NETWORKS").all()
+    q = db.session.query(Student).with_entities(Student.firstname, Student.lastname).join(
+        Student.components, Enrollment.component, CourseComponent.course).filter(Course.name == "MATHEMATICS 2P: GRAPHS AND NETWORKS").all()
     return jsonify(q), 200

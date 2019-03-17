@@ -27,6 +27,7 @@ def view_courses(name, id):
     result = OrderedDict()
     # Create the context for the render template, keyed by
     # (course_id, course_name) and valued by [tutor_name, attendance_last_taken, attendance_percent]
-    result[(course_id, course_name)] = [tutor_name, attendance_last_taken, attendance_percent]
+    result[(course_id, course_name)] = [tutor_name,
+                                        attendance_last_taken, attendance_percent]
 
     return render_template("course_view.html", course_details=result, course_name=course_name)
