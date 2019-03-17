@@ -2,3 +2,6 @@
 !anonymized.csv
 *.sqlite
 __pycache__/
+*.pyc
+venv
+.vscode

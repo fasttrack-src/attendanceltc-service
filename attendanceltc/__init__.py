@@ -2,8 +2,23 @@ from flask import Flask, jsonify
 from .views.api import api
 from .views.school_admin_view import school_admin_view
 from .models.shared import db
+from attendanceltc.models.user import User
+from flask_login import LoginManager
+from flask_login import UserMixin
+
+
 
 app = Flask(__name__)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "api.login"
+
+@login_manager.user_loader
+def load_user(user_id):
+	print(user_id)
+	return User(user_id)
+
 app.config.from_object('config')
 db.init_app(app)
 
