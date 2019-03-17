@@ -22,3 +22,9 @@ LOGGER_NAME = "%s_log" % PROJECT_NAME
 PERMANENT_SESSION_LIFETIME = timedelta(days=1)
 
 SEND_FILE_MAX_AGE_DEFAULT = 0
+
+ADMIN_PASSWORD = "8031f8b1832d6a1a71e18c7cdea9660b5080f1f7aef96704cbacfa06828aa02d"
+
+LDAP_URL = "ldap://localhost"
+LDAP_USER_STRING = "uid={username},ou=PeopleOU,dc=ad,dc=dcs,dc=gla,dc=ac,dc=uk"
+LDAP_PERSON_BASE = "ou=PeopleOU,dc=ad,dc=dcs,dc=gla,dc=ac,dc=uk"
