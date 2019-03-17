@@ -29,7 +29,7 @@
 					<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
 				</li>
 				<li class="nav-item">
-                        <a class="nav-link" href="/course">Course </a>
+                        <a class="nav-link" href="#">Link </a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
@@ -68,8 +68,8 @@
 			<tbody>
 				{% for (id, name), (students, tier4) in courses.items() %}
 				<tr>
-                    <td id="{{ id }}-id" ><a href="/course">{{ id }}</a></td>
-                    <td id="{{ id }}-name"><a href="/course">{{ name }}</a></td>
+                    <td id="{{ id }}-id" ><a href="/course/{{ name }}/{{ id }}">{{ id }}</a></td>
+                    <td id="{{ id }}-name"><a href="/course/{{ name }}/{{ id }}">{{ name }}</a></td>
 					<td id="{{ id }}-students">{{ students }}</td>
 					<td id="{{ id }}-tier4">{{ tier4 }}</td>
 					<td></td>

@@ -10,12 +10,10 @@ from attendanceltc.models.student import Student
 school_course_view = Blueprint('school_course_view', __name__)
 
 
-@school_course_view.route('/course', methods=["GET"])
-def view_courses():
-    print("hello world!")
-    # todo: pass the id from the url
-    course_id = "MATHS1001"
-    course_name = "Mathematics 1R"
+@school_course_view.route('/course/<name>/<id>', methods=["GET"])
+def view_courses(name, id):
+    course_id = id
+    course_name = name
 
     # who tutors
     tutor_name = "Adam Kurkiewicz"
@@ -31,4 +29,4 @@ def view_courses():
     # (course_id, course_name) and valued by [tutor_name, attendance_last_taken, attendance_percent]
     result[(course_id, course_name)] = [tutor_name, attendance_last_taken, attendance_percent]
 
-    return render_template("course_view.html", course_details=result)
+    return render_template("course_view.html", course_details=result, course_name=course_name)
