@@ -5,6 +5,11 @@ __basedir__ = os.path.abspath(os.path.dirname(__file__))
 
 PROJECT_NAME = 'attendanceltc'
 
+# Environment
+ENV = 'development'
+TESTING = True
+DEBUG = True
+
 # database
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(__basedir__, '%s.sqlite'%
                                                       PROJECT_NAME)

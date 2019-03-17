@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -25,10 +26,10 @@
 		<div class="collapse navbar-collapse" id="navbarCollapse">
 			<ul class="navbar-nav mr-auto">
 				<li class="nav-item active">
-					<a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+					<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="#">Link</a>
+                        <a class="nav-link" href="#">Link </a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
@@ -41,14 +42,10 @@
 		</div>
 	</nav>
 
-    <main role="main" class="container">
+	<main role="main" class="container">
 		<div class="table-title">
 			<div class="row">
-                {# this doesn't need to be a for loop #}
-{#                {% for (id, name), (tutor_name, attendance_last_taken, attendance_percent) in course_details.items()[0].name %}#}
-{#				    <div class="col-sm-8"><h2>{{ name }}</h2></div>#}
-{#                {%  endfor %}#}
-                <div class="col-sm-8"><h2> {{ course_name }}</h2></div>
+				<div class="col-sm-8"><h2>Courses in Department</h2></div>
 				<div class="col-sm-4">
 					<div class="search-box">
 						<input type="text" class="form-control" onkeyup="filterCourses()" placeholder="Search&hellip;">
@@ -61,26 +58,39 @@
 			<thead>
 				<tr>
 					<th>Course ID</th>
-					<th>Who tutors</th>
-					<th>Attendance Last Taken</th>
-					<th>Attendance Last Week</th>
+					<th>Course Name</th>
+					<th>Students Enrolled</th>
+					<th>Tier 4 Students</th>
+					<th>Tier 4 Attendance Last Week</th>
+					<th>Tier 4 Attendance Last Month</th>
 				</tr>
 			</thead>
 			<tbody>
-				{% for (id, name), (tutor_name, attendance_last_taken, attendance_percent) in course_details.items() %}
+				{% for (id, name), (students, tier4) in courses.items() %}
 				<tr>
-                    <td id="{{ id }}-id">{{ id }}</td>
-					<td id="{{ id }}-tutor">{{ tutor_name }}</td>
-					<td id="{{ id }}-name">{{ attendance_last_taken }}</td>
-					<td id="{{ id }}-students">{{ attendance_percent }}</td>
+                    <td id="{{ id }}-id" ><a href="/course/{{ name }}/{{ id }}">{{ id }}</a></td>
+                    <td id="{{ id }}-name"><a href="/course/{{ name }}/{{ id }}">{{ name }}</a></td>
+					<td id="{{ id }}-students">{{ students }}</td>
+					<td id="{{ id }}-tier4">{{ tier4 }}</td>
+					<td></td>
+					<td></td>
 				</tr>
 				{% endfor %}
 			</tbody>
+			<tfoot>
+				<tr>
+					<th>Course ID</th>
+					<th>Course Name</th>
+					<th>Students Enrolled</th>
+					<th>Tier 4 Students</th>
+					<th>Tier 4 Attendance Last Week</th>
+					<th>Tier 4 Attendance Last Month</th>
+				</tr>
+			</tfoot>
 		</table>
-
+	
 
 	</main>
-
 
 	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 	<script src="/static/script.js"></script>
