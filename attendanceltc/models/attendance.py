@@ -7,12 +7,12 @@ from sqlalchemy.orm import relationship
 
 class Attendance(db.Model):
     __tablename__ = 'attendance'
-    __table_args__ = (UniqueConstraint('student_id', 'coursecomponent_id' 'date'), )
+    __table_args__ = (UniqueConstraint('student_id', 'coursecomponent_id', 'date'), )
     
     id = Column(Integer, primary_key=True, auto_increment=True)
     student_id = Column(Integer, ForeignKey('student.id'), nullable=False)
     coursecomponent_id = Column(Integer, ForeignKey('coursecomponent.id'), nullable=False)
-    date = Column(Date, default=datetime.datetime.now)
+    date = Column(Date, default=datetime.datetime.now, nullable=False)
 
-    student = relationship("Student", back_populates="components")
-    component = relationship("CourseComponent", back_populates="students")
+    student = relationship("Student", back_populates="attendance")
+    component = relationship("CourseComponent", back_populates="attendance")

@@ -14,6 +14,7 @@ class Student(db.Model):
     tier4 = Column(Boolean, default=0)
 
     components = relationship("Enrollment", back_populates="student")
+    attendance = relationship("Attendance", back_populates="student")
 
     def __str__(self):
         return self.lastname + ", " + self.firstname + " (" + self.id + ")"
