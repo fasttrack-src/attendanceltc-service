@@ -17,13 +17,13 @@ def view_course():
 
     # Get student count per course
     students_count = db.session.query(Course, Student) \
-        .with_entities(Course.id, Course.name, func.count(func.distinct(Student.id))) \
+        .with_entities(Course.subject_id, Course.catalog_id, Course.name, func.count(func.distinct(Student.id))) \
         .join(Student.components, Enrollment.component, CourseComponent.course) \
         .group_by(Course.id).order_by(Course.id).all()
 
     # Get Tier 4 student count per course
     tier4_count = db.session.query(Course, Student) \
-        .with_entities(Course.id, Course.name, func.count(func.distinct(Student.id))) \
+        .with_entities(Course.subject_id, Course.catalog_id, Course.name, func.count(func.distinct(Student.id))) \
         .join(Student.components, Enrollment.component, CourseComponent.course) \
         .filter(Student.tier4).group_by(Course.id) \
         .order_by(Course.id).all()
@@ -36,15 +36,17 @@ def view_course():
     # First, go through the student count query. We will assume
     # the course has no tier 4 students.
     for student in students_count:
-        course_id, course_name, student_count = student
+        subject_id, catalog_id, course_name, student_count = student
+        course_id = subject_id + catalog_id
 
         result[(course_id, course_name)] = [student_count, 0]
 
     # Now, go through the tier 4 query, updating the original dictionary
     # as required.
     for student in tier4_count:
-        course_id, course_name, tier4_count = student
-
+        subject_id, catalog_id, course_name, tier4_count = student
+        course_id = subject_id + catalog_id
+        
         result[(course_id, course_name)][-1] = tier4_count
 
     return render_template("school_admin_view.html", courses=result)
