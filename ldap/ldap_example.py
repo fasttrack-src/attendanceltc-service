@@ -2,8 +2,7 @@ import ldap
 import pprint
 pp = pprint.PrettyPrinter(indent=2)
 pprint = pp.pprint
-l = ldap.initialize("ldap://localhost")
-l.simple_bind_s("uid=adamk,ou=PeopleOU,dc=ad,dc=dcs,dc=gla,dc=ac,dc=uk", "hi")
-result = l.search_s("ou=PeopleOU,dc=ad,dc=dcs,dc=gla,dc=ac,dc=uk",
-                    ldap.SCOPE_SUBTREE, "uid=*dam*")
-pprint(result)
+l = ldap.initialize("ldap://spitfire.campus.gla.ac.uk")
+l.simple_bind_s("2333134p@campus.gla.ac.uk", "<Marcell's password>")
+result = l.search_s("CN=Person,CN=Schema,CN=Configuration,DC=campus,DC=gla,DC=ac,DC=uk", ldap.SCOPE_SUBTREE, "(cn=2333134P)")
+print(result)
