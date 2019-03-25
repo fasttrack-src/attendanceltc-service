@@ -1,34 +1,20 @@
 from .shared import db
-from sqlalchemy import PrimaryKeyConstraint, ForeignKey
+from sqlalchemy import Column, String, Integer
+from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
-
-from .student import Student, Enrollment
-
 
 class Course(db.Model):
     __tablename__ = 'course'
 
-    id = db.Column(db.String(100), primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
+    __table_args__ = (UniqueConstraint('subject_id', 'catalog_id'),)
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    subject_id = Column(String(100), ForeignKey('subject.id'), nullable=False)
+    catalog_id = Column(String(150), nullable=False)
+    name = Column(String(150), nullable=False)
 
     components = relationship("CourseComponent", back_populates="course")
+    subject = relationship("Subject", back_populates="courses")
 
     def __str__(self):
         return self.name + " (" + self.id + ")"
-
-
-class CourseComponent(db.Model):
-    __tablename__ = 'coursecomponent'
-    __table_args__ = (PrimaryKeyConstraint("name", "course_id"),)
-
-    name = db.Column(db.String(150))
-    course_id = db.Column(db.String(100), ForeignKey('course.id'))
-
-    students = relationship("Enrollment", back_populates="component")
-    course = relationship("Course", back_populates="components")
-
-    def __str__(self):
-        return self.course.name + " - " + self.name
-
-    def __repr__(self):
-        return "<CourseComponent " + self.course.id + " " + self.name + ">"

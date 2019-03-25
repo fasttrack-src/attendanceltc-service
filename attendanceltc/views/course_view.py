@@ -4,8 +4,10 @@ from flask import Blueprint, jsonify, request, render_template
 from sqlalchemy import func
 
 from attendanceltc.models.shared import db
-from attendanceltc.models.course import Course, CourseComponent, Enrollment
+from attendanceltc.models.course import Course
+from attendanceltc.models.coursecomponent import CourseComponent
 from attendanceltc.models.student import Student
+from attendanceltc.models.enrollment import Enrollment
 
 school_course_view = Blueprint('school_course_view', __name__)
 
