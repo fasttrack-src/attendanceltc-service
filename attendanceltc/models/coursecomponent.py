@@ -12,6 +12,7 @@ class CourseComponent(db.Model):
     course_id = Column(String(100), ForeignKey('course.id'), nullable=False)
 
     students = relationship("Enrollment", back_populates="component")
+    attendance = relationship("Attendance", back_populates="component")
     course = relationship("Course", back_populates="components")
 
     def __str__(self):

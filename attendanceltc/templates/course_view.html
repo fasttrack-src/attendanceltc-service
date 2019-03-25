@@ -14,14 +14,14 @@
 		</tr>
 	</thead>
 	<tbody>
-		{% for component, (count, count_tier4) in components.items() %}
+		{% for component, (count, count_tier4, last_date, last_week_date) in components.items() %}
 		<tr>
 			<td id="{{ component }}-id">{{ component }}</td>
 			<td id="{{ component }}-tutor"></td>
 			<td id="{{ component }}-students">{{ count }}</td>
 			<td id="{{ component }}-tier4-students">{{ count_tier4 }}</td>
-			<td id="{{ component }}-last-taken"></td>
-			<td id="{{ component }}-last-week"></td>
+			<td id="{{ component }}-last-taken">{{ last_date }}</td>
+			<td id="{{ component }}-last-week">{{ last_week_date }}</td>
 		</tr>
 		{% endfor %}
 	</tbody>
