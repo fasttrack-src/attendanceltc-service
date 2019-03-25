@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from flask import Blueprint, jsonify, request, render_template
+from flask import Blueprint, jsonify, request, render_template, abort
 from sqlalchemy import func
 
 from attendanceltc.models.shared import db
@@ -12,24 +12,31 @@ from attendanceltc.models.enrollment import Enrollment
 school_course_view = Blueprint('school_course_view', __name__)
 
 
-@school_course_view.route('/course/<name>/<id>', methods=["GET"])
-def view_courses(name, id):
-    course_id = id
-    course_name = name
+@school_course_view.route('/course/<subject>/<catalog>/', methods=["GET"])
+def view_courses(subject, catalog, name=None):
 
-    # who tutors
-    tutor_name = "Adam Kurkiewicz"
+    course_count = db.session.query(Course, CourseComponent) \
+        .with_entities(Course.name, CourseComponent.name, func.count(func.distinct(Student.id))) \
+        .join(Student.components, Enrollment.component, CourseComponent.course) \
+        .filter(Course.subject_id==subject).filter(Course.catalog_id==catalog) \
+        .group_by(CourseComponent.id).order_by(CourseComponent.name).all()
 
-    # attendance last taken
-    attendance_last_taken = "2019-03-08"
+    course_count_tier4 = db.session.query(Course, CourseComponent) \
+        .with_entities(Course.name, CourseComponent.name, func.count(func.distinct(Student.id))) \
+        .join(Student.components, Enrollment.component, CourseComponent.course) \
+        .filter(Course.subject_id==subject).filter(Course.catalog_id==catalog) \
+        .filter(Student.tier4) \
+        .group_by(CourseComponent.id).order_by(CourseComponent.name).all()
 
-    # attendance last week in percent
-    attendance_percent = 66
-
+    if not course_count:
+        return abort(404)
+    
     result = OrderedDict()
-    # Create the context for the render template, keyed by
-    # (course_id, course_name) and valued by [tutor_name, attendance_last_taken, attendance_percent]
-    result[(course_id, course_name)] = [tutor_name,
-                                        attendance_last_taken, attendance_percent]
 
-    return render_template("course_view.html", course_details=result, course_name=course_name)
+    for _, component, count in course_count:
+        result[component] = [count, 0]
+
+    for _, component, count in course_count_tier4:
+        result[component][-1] = count
+    
+    return render_template("course_view.html", name=course_count[0][0], components=result)

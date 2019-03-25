@@ -24,12 +24,12 @@
 		</tr>
 	</thead>
 	<tbody>
-		{% for (id, name), (students, tier4) in courses.items() %}
+		{% for (subject, catalog, name), (students, tier4) in courses.items() %}
 		<tr>
-			<td id="{{ id }}-id" ><a href="/course/{{ name }}/{{ id }}">{{ id }}</a></td>
-			<td id="{{ id }}-name"><a href="/course/{{ name }}/{{ id }}">{{ name }}</a></td>
-			<td id="{{ id }}-students">{{ students }}</td>
-			<td id="{{ id }}-tier4">{{ tier4 }}</td>
+			<td id="{{ subject }}{{catalog}}-id" ><a href="/course/{{ subject }}/{{ catalog }}/">{{ subject }}{{catalog}}</a></td>
+			<td id="{{ subject }}{{catalog}}-name"><a href="/course/{{ subject }}/{{ catalog }}/">{{ name }}</a></td>
+			<td id="{{ subject }}{{catalog}}-students">{{ students }}</td>
+			<td id="{{ subject }}{{catalog}}-tier4">{{ tier4 }}</td>
 			<td></td>
 			<td></td>
 		</tr>

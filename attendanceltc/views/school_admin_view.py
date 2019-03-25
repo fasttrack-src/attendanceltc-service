@@ -37,16 +37,14 @@ def view_course():
     # the course has no tier 4 students.
     for student in students_count:
         subject_id, catalog_id, course_name, student_count = student
-        course_id = subject_id + catalog_id
 
-        result[(course_id, course_name)] = [student_count, 0]
+        result[(subject_id, catalog_id, course_name)] = [student_count, 0]
 
     # Now, go through the tier 4 query, updating the original dictionary
     # as required.
     for student in tier4_count:
         subject_id, catalog_id, course_name, tier4_count = student
-        course_id = subject_id + catalog_id
-        
-        result[(course_id, course_name)][-1] = tier4_count
+
+        result[(subject_id, catalog_id, course_name)][-1] = tier4_count
 
     return render_template("school_admin_view.html", courses=result)
