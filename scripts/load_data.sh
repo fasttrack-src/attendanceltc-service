@@ -1,0 +1,1 @@
+time curl -H "Content-Type: text/csv" --data-binary "@../anonymize/anonymized.csv" localhost:8000/students?uploadType=MATHS_STATS_CSV_1

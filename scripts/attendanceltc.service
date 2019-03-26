@@ -1,0 +1,19 @@
+[Unit]
+Description=Attendance LTC API and Web Interface
+After=network.target
+After=systemd-user-sessions.service
+After=network-online.target
+
+[Service]
+User=ubuntu
+Type=forking
+ExecStart=/home/ubuntu/attendanceltc/scripts/start-all.sh
+ExecStop=/home/ubuntu/attendanceltc/scripts/stop-all.sh
+TimeoutSec=30
+Restart=on-failure
+RestartSec=30
+StartLimitInterval=350
+StartLimitBurst=10
+
+[Install]
+WantedBy=multi-user.target
