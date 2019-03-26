@@ -1,6 +1,8 @@
 from collections import OrderedDict
 
 from flask import Blueprint, jsonify, request, render_template
+from flask_login import login_required
+
 from sqlalchemy import func
 
 from attendanceltc.models.shared import db
@@ -13,6 +15,7 @@ school_admin_view = Blueprint('school_admin_view', __name__)
 
 
 @school_admin_view.route('/', methods=["GET"])
+@login_required
 def view_course():
 
     # Get student count per course

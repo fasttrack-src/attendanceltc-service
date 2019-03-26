@@ -2,6 +2,8 @@ import datetime
 from collections import OrderedDict
 
 from flask import Blueprint, jsonify, request, render_template, abort
+from flask_login import login_required
+
 from sqlalchemy import func
 
 from attendanceltc.models.shared import db
@@ -15,6 +17,7 @@ school_course_view = Blueprint('school_course_view', __name__)
 
 
 @school_course_view.route('/course/<subject>/<catalog>/', methods=["GET"])
+@login_required
 def view_courses(subject, catalog, name=None):
 
     course_count = db.session.query(Course, CourseComponent) \
@@ -46,8 +49,6 @@ def view_courses(subject, catalog, name=None):
         .filter(Course.subject_id==subject).filter(Course.catalog_id==catalog) \
         .filter(Attendance.date >= start_of_last_weekday) \
         .group_by(CourseComponent.id).order_by(CourseComponent.name).all()
-
-    print(attendance_last_week)
 
     if not course_count:
         return abort(404)
