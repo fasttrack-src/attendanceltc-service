@@ -7,8 +7,8 @@ After=network-online.target
 [Service]
 User=ubuntu
 Type=forking
-ExecStart=/home/ubuntu/attendanceltc/scripts/start-all.sh
-ExecStop=/home/ubuntu/attendanceltc/scripts/stop-all.sh
+ExecStart=/home/ubuntu/attendanceltc-service/scripts/start-all.sh
+ExecStop=/home/ubuntu/attendanceltc-service/scripts/stop-all.sh
 TimeoutSec=30
 Restart=on-failure
 RestartSec=30
