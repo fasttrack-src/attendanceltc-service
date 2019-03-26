@@ -3,6 +3,7 @@ import ldap
 import hashlib
 import binascii
 import urllib.parse
+import json
 
 from flask import current_app as app
 from flask import Blueprint, request, abort, redirect, render_template
