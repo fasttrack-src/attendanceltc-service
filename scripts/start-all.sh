@@ -1,4 +1,4 @@
 #!/bin/bash
 
-source ../../attendanceltc-service-virtualenv/bin/activate
-python3 ../run.py
+source /home/ubuntu/attendanceltc-service-virtualenv/bin/activate
+python3 /home/ubuntu/attendanceltc-service/run.py
