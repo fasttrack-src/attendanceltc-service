@@ -22,13 +22,13 @@ def view_courses(subject, catalog, name=None):
 
     course_count = db.session.query(Course, CourseComponent) \
         .with_entities(Course.name, CourseComponent.name, func.count(func.distinct(Student.id))) \
-        .join(Student.components, Enrollment.component, CourseComponent.course) \
+        .join(Student.enrollment, Enrollment.component, CourseComponent.course) \
         .filter(Course.subject_id==subject).filter(Course.catalog_id==catalog) \
         .group_by(CourseComponent.id).order_by(CourseComponent.name).all()
 
     course_count_tier4 = db.session.query(Course, CourseComponent) \
         .with_entities(Course.name, CourseComponent.name, func.count(func.distinct(Student.id))) \
-        .join(Student.components, Enrollment.component, CourseComponent.course) \
+        .join(Student.enrollment, Enrollment.component, CourseComponent.course) \
         .filter(Course.subject_id==subject).filter(Course.catalog_id==catalog) \
         .filter(Student.tier4) \
         .group_by(CourseComponent.id).order_by(CourseComponent.name).all()

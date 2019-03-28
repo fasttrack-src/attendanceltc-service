@@ -17,4 +17,4 @@ class Course(db.Model):
     subject = relationship("Subject", back_populates="courses")
 
     def __str__(self):
-        return self.name + " (" + self.id + ")"
+        return "{} ({} {})".format(self.name, self.subject_id, self.catalog_id)

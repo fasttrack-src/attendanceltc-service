@@ -13,7 +13,7 @@ class Student(db.Model):
     year = Column(String(15), nullable=False)
     tier4 = Column(Boolean, default=0)
 
-    components = relationship("Enrollment", back_populates="student")
+    enrollment = relationship("Enrollment", back_populates="student")
     attendance = relationship("Attendance", back_populates="student")
 
     def __str__(self):

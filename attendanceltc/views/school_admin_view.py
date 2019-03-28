@@ -21,13 +21,13 @@ def view_course():
     # Get student count per course
     students_count = db.session.query(Course, Student) \
         .with_entities(Course.subject_id, Course.catalog_id, Course.name, func.count(func.distinct(Student.id))) \
-        .join(Student.components, Enrollment.component, CourseComponent.course) \
+        .join(Student.enrollment, Enrollment.component, CourseComponent.course) \
         .group_by(Course.id).order_by(Course.id).all()
 
     # Get Tier 4 student count per course
     tier4_count = db.session.query(Course, Student) \
         .with_entities(Course.subject_id, Course.catalog_id, Course.name, func.count(func.distinct(Student.id))) \
-        .join(Student.components, Enrollment.component, CourseComponent.course) \
+        .join(Student.enrollment, Enrollment.component, CourseComponent.course) \
         .filter(Student.tier4).group_by(Course.id) \
         .order_by(Course.id).all()
 

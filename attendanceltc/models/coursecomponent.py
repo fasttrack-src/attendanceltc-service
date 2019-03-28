@@ -16,7 +16,4 @@ class CourseComponent(db.Model):
     course = relationship("Course", back_populates="components")
 
     def __str__(self):
-        return self.course.name + " - " + self.name
-
-    def __repr__(self):
-        return "<CourseComponent " + self.course.id + " " + self.name + ">"
+        return "{} ({})".format(self.name, self.course.name)

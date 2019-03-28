@@ -11,5 +11,5 @@ class Enrollment(db.Model):
     student_id = Column(Integer, ForeignKey('student.id'), nullable=False)
     coursecomponent_id = Column(Integer, ForeignKey('coursecomponent.id'), nullable=False)
 
-    student = relationship("Student", back_populates="components")
+    student = relationship("Student", back_populates="enrollment")
     component = relationship("CourseComponent", back_populates="students")
