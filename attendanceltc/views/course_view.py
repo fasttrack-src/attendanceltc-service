@@ -7,6 +7,8 @@ from flask_login import login_required
 from sqlalchemy import func
 
 from attendanceltc.models.shared import db
+from attendanceltc.models.subject import Subject
+from attendanceltc.models.department import Department
 from attendanceltc.models.course import Course
 from attendanceltc.models.coursecomponent import CourseComponent
 from attendanceltc.models.student import Student
@@ -23,22 +25,25 @@ def view_courses(subject, catalog, name=None):
     course_count = db.session.query(Course, CourseComponent) \
         .with_entities(Course.name, CourseComponent.name, func.count(func.distinct(Student.id))) \
         .join(Student.enrollment, Enrollment.component, CourseComponent.course) \
-        .filter(Course.subject_id==subject).filter(Course.catalog_id==catalog) \
+        .filter(Course.subject_id == subject).filter(Course.catalog_id == catalog) \
         .group_by(CourseComponent.id).order_by(CourseComponent.name).all()
+
+    if not course_count:
+        return abort(404)
 
     course_count_tier4 = db.session.query(Course, CourseComponent) \
         .with_entities(Course.name, CourseComponent.name, func.count(func.distinct(Student.id))) \
         .join(Student.enrollment, Enrollment.component, CourseComponent.course) \
-        .filter(Course.subject_id==subject).filter(Course.catalog_id==catalog) \
+        .filter(Course.subject_id == subject).filter(Course.catalog_id == catalog) \
         .filter(Student.tier4) \
         .group_by(CourseComponent.id).order_by(CourseComponent.name).all()
-    
+
     attendance_last = db.session.query(Course, CourseComponent, Attendance) \
         .with_entities(Course.name, CourseComponent.name, func.max(Attendance.date)) \
         .join(Attendance.component, CourseComponent.course) \
-        .filter(Course.subject_id==subject).filter(Course.catalog_id==catalog) \
+        .filter(Course.subject_id == subject).filter(Course.catalog_id == catalog) \
         .group_by(CourseComponent.id).order_by(CourseComponent.name).all()
-    
+
     today = datetime.date.today()
     start_of_last_weekday = datetime.timedelta(days=today.weekday(), weeks=1)
     start_of_last_weekday = today - start_of_last_weekday
@@ -46,13 +51,29 @@ def view_courses(subject, catalog, name=None):
     attendance_last_week = db.session.query(Course, CourseComponent, Attendance) \
         .with_entities(Course.name, CourseComponent.name, func.max(Attendance.date)) \
         .join(Attendance.component, CourseComponent.course) \
-        .filter(Course.subject_id==subject).filter(Course.catalog_id==catalog) \
+        .filter(Course.subject_id == subject).filter(Course.catalog_id == catalog) \
         .filter(Attendance.date >= start_of_last_weekday) \
         .group_by(CourseComponent.id).order_by(CourseComponent.name).all()
 
-    if not course_count:
-        return abort(404)
-    
+    subject_name, department_name = db.session.query(Subject, Department) \
+        .with_entities(Subject.name, Department.name) \
+        .join(Subject.department) \
+        .filter(Subject.id == subject) \
+        .first()
+
+    students_count, = db.session.query(Student) \
+        .with_entities(func.count(func.distinct(Student.id))) \
+        .join(Student.enrollment, Enrollment.component, CourseComponent.course) \
+        .filter(Course.subject_id == subject).filter(Course.catalog_id == catalog) \
+        .first()
+
+    tier4_count, = db.session.query(Student) \
+        .with_entities(func.count(func.distinct(Student.id))) \
+        .join(Student.enrollment, Enrollment.component, CourseComponent.course) \
+        .filter(Course.subject_id == subject).filter(Course.catalog_id == catalog) \
+        .filter(Student.tier4) \
+        .first()
+
     result = OrderedDict()
 
     for _, component, count in course_count:
@@ -60,11 +81,15 @@ def view_courses(subject, catalog, name=None):
 
     for _, component, count in course_count_tier4:
         result[component][1] = count
-    
+
     for _, component, date in attendance_last:
         result[component][2] = date.strftime("%a, %x")
-    
+
     for _, component, date in attendance_last_week:
         result[component][3] = date.strftime("%a, %x")
 
-    return render_template("course_view.html", name=course_count[0][0], components=result)
+    context = {"name": course_count[0][0], "components": result, "subject_id": subject, "catalog_id": catalog,
+               "subject_name": subject_name, "department_name": department_name, "students_count": students_count,
+               "tier4_count": tier4_count}
+
+    return render_template("course_view.html", **context)

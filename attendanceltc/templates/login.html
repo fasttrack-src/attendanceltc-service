@@ -9,6 +9,11 @@
     <div class="alert alert-danger">
         <strong>Error.</strong> {{ error }}
     </div>
+    {% else %}
+    <div class="alert alert-info">
+            <strong>To log in,</strong> use the GUID and password you use to
+            access other University of Glasgow resources.
+        </div>
     {% endif %}
 
     <label for="username" class="sr-only">GUID or username</label>
