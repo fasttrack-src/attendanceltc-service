@@ -56,7 +56,7 @@ def get_groups():
 
     components = db.session.query(Course, CourseComponent) \
         .with_entities(Course.name, Course.id, CourseComponent.name, CourseComponent.id) \
-        .order_by(Course.id, CourseComponent.id).all()
+        .order_by(Course.id, CourseComponent.id).limit(10).all()
     
     for component in components:
         course_name, course_id, component_name, component_id = component
