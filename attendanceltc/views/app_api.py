@@ -122,7 +122,7 @@ def get_students():
 
         attendance[login]["attendedPastTwoWeeks"] = True
 
-    return jsonify(resp), 200
+    return jsonify(list(attendane.values())), 200
 
 @app_api.route("/phone-api/submit-attendance", methods=["POST"])
 @login_required
