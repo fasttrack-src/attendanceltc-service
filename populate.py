@@ -35,7 +35,7 @@ def create_mock_school():
     s = requests.Session()
 
     # Try logging in with admin credentials.
-    r = s.put("http://localhost/rest-login", json={"username": "admin", "password": "p"})
+    r = s.post("http://localhost/phone-api/login", json={"guid": "admin", "password": "p"})
     print(r.text)
 
     # Open file and try importing.

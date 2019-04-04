@@ -6,3 +6,7 @@ __pycache__/
 venv
 .vscode
 .idea/
+
+.DS_Store
+
+scripts/test-existing-api.py

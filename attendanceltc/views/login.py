@@ -52,7 +52,6 @@ def is_safe_url(target):
 
 @login_manager.user_loader
 def load_user(user_id):
-	print(user_id)
 	return User(user_id)
 
 @login.route('/login', methods=['GET', 'POST'])
@@ -85,18 +84,6 @@ def handle_login():
             
     if request.method == 'GET':
         return render_template("login.html")
-
-
-@login.route("/rest-login", methods=["PUT"])
-def rest_login():
-    login_data = json.loads(request.get_data().decode("utf-8"))
-    username = login_data["username"]
-    password = login_data["password"]
-    auth_result, error = authenticate(username, password)
-    if auth_result:
-        l = login_user(User(username))
-        return "", 200
-    return "Couldn't authenticate: {error}".format(error=error), 401
 
 @login.route("/logout")
 @login_required

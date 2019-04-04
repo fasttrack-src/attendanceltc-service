@@ -9,6 +9,7 @@ from .views.login import login, login_manager
 from .views.import_db import import_db
 from .views.school_admin_view import school_admin_view
 from .views.course_view import school_course_view
+from .views.app_api import app_api
 
 app = Flask(__name__)
 
@@ -29,6 +30,7 @@ app.register_blueprint(login)
 app.register_blueprint(import_db)
 app.register_blueprint(school_admin_view)
 app.register_blueprint(school_course_view)
+app.register_blueprint(app_api)
 
 @app.errorhandler(404)
 def not_found(error):

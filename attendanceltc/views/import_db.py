@@ -1,7 +1,6 @@
 import io
 import csv
 import json
-import functools
 
 from flask import current_app as app
 from flask import Blueprint, request, g
@@ -116,7 +115,7 @@ def import_mycampus_feed():
     except:
         return g.resp.error("There has been an error updating the database.")
 
-    g.resp.data("Successful import.")
+    g.resp.message("Successful import.")
 
 
 @import_db.route('/students', methods=["POST"])
