@@ -77,7 +77,6 @@ def get_students():
 
     try:
         component_id = int(data["groupId"])
-        course_name = data["course"]
     except:
         resp = {"message": "Invalid JSON submitted."}
         return jsonify(resp), 400
