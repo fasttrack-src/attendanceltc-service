@@ -55,7 +55,7 @@ def login():
         return jsonify(resp), 401
 
 
-@app_api.route("/phone-api/get-groups", methods=["POST"])
+@app_api.route("/phone-api/get-groups", methods=["GET"])
 @login_required
 def get_groups():
     resp = []
