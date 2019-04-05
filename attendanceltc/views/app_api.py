@@ -139,13 +139,22 @@ def submit_attendance():
 
     try:
         barcode = data["barcode"]
-        timestamp = datetime.datetime.fromtimestamp(int(data["timestamp"]) / 1e3)
+        student = db.session.query(Student).filter(Student.barcode == barcode).one()
+
         component = int(data["componentId"])
+        component = db.session.query(CourseComponent).get(component)
+
+        date = datetime.datetime.fromtimestamp(int(data["timestamp"]) / 1e3)
+
     except:
-        resp = {"message": "Invalid JSON submitted."}
+        resp = {"message": "Invalid request submitted."}
         return jsonify(resp), 400
 
-    print("submitting attendance for", barcode, timestamp, component)
+    print("submitting attendance for", student, timestamp, component)
+
+    att = Attendance(date=date, student=student, component=component)
+    db.session.add(att)
+    db.session.commit()
 
     return "", 200
 
