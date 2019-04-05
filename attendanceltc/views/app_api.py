@@ -3,6 +3,8 @@ import datetime
 from flask import Blueprint, jsonify, request, abort, g
 from flask_login import LoginManager, login_user, logout_user, current_user
 
+from sqlalchemy import Date, cast
+
 from .login import authenticate
 
 from attendanceltc.models.shared import db
@@ -97,7 +99,7 @@ def get_students():
         .join(Student.enrollment, Enrollment.component) \
         .join(Attendance, (CourseComponent.id == Attendance.coursecomponent_id) & (Student.id == Attendance.student_id)) \
         .filter(CourseComponent.id == component_id) \
-        .filter(Attendance.date.date() == today) \
+        .filter(cast(Attendance.date, Date) == today) \
         .order_by(Student.lastname, Student.firstname).all()
 
     students_attended_two_weeks_ago = db.session.query(Student) \
