@@ -102,6 +102,7 @@ def get_students():
         .filter(cast(Attendance.date, Date) == today) \
         .order_by(Student.lastname, Student.firstname).all()
 
+    print(students_attended_today)
     students_attended_two_weeks_ago = db.session.query(Student) \
         .with_entities(Student.id) \
         .join(Student.enrollment, Enrollment.component) \
