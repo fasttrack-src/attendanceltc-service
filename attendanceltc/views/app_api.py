@@ -97,7 +97,7 @@ def get_students():
         .join(Student.enrollment, Enrollment.component) \
         .join(Attendance, (CourseComponent.id == Attendance.coursecomponent_id) & (Student.id == Attendance.student_id)) \
         .filter(CourseComponent.id == component_id) \
-        .filter(Attendance.date == today) \
+        .filter(Attendance.date.date() == today) \
         .order_by(Student.lastname, Student.firstname).all()
 
     students_attended_two_weeks_ago = db.session.query(Student) \
