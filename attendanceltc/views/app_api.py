@@ -150,7 +150,7 @@ def submit_attendance():
         resp = {"message": "Invalid request submitted."}
         return jsonify(resp), 400
 
-    print("submitting attendance for", student, timestamp, component)
+    print("submitting attendance for", student, component, date)
 
     att = Attendance(date=date, student=student, component=component)
     db.session.add(att)
