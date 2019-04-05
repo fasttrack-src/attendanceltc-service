@@ -57,7 +57,7 @@ def create_mock_attendance():
     start_of_last_weekday = datetime.timedelta(days=today.weekday(), weeks=1)
     start_of_last_weekday = today - start_of_last_weekday
 
-    att2 = Attendance(student=st, component=cc, date=start_of_last_weekday)
+    att2 = Attendance(student=st, component=cc, timestamp=start_of_last_weekday)
     db.session.add(att2)
 
 with app.app_context():
