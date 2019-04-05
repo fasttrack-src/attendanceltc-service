@@ -78,7 +78,7 @@ def get_students():
     data = request.get_json()
 
     try:
-        component_id = int(data["groupId"])
+        component_id = int(data["componentId"])
     except:
         resp = {"message": "Invalid JSON submitted."}
         return jsonify(resp), 400
