@@ -35,9 +35,13 @@ def login():
     login_data = request.get_json()
     g.resp = APIResponseMaker()
 
-    username = login_data["guid"]
-    password = login_data["password"]
-
+    try:
+        username = login_data["guid"]
+        password = login_data["password"]
+    except:
+        resp = {"message": "Invalid JSON submitted."}
+        return jsonify(resp), 400
+    
     auth_result, error = authenticate(username, password)
     if auth_result:
         l = login_user(User(username))
@@ -70,8 +74,13 @@ def get_groups():
 @login_required
 def get_students():
     data = request.get_json()
-    component_id = int(data["groupId"])
-    course_name = data["course"]
+
+    try:
+        component_id = int(data["groupId"])
+        course_name = data["course"]
+    except:
+        resp = {"message": "Invalid JSON submitted."}
+        return jsonify(resp), 400
 
     students_all = db.session.query(Student) \
         .with_entities(Student.id, Student.lastname, Student.firstname, Student.barcode) \
@@ -127,8 +136,19 @@ def get_students():
 @app_api.route("/phone-api/submit-attendance", methods=["POST"])
 @login_required
 def submit_attendance():
-    pass
+    data = request.get_json()
 
+    try:
+        barcode = data["barcode"]
+        timestamp = datetime.datetime.fromtimestamp(int(data["timestamp"]) / 1e3)
+        component = int(data["componentId"])
+    except:
+        resp = {"message": "Invalid JSON submitted."}
+        return jsonify(resp), 400
+
+    print("submitting attendance for", barcode, timestamp, component)
+
+    return "", 200
 
 @app_api.route("/phone-api/logout", methods=["GET"])
 @login_required
