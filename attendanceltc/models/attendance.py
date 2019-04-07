@@ -22,3 +22,4 @@ class Attendance(db.Model):
     
     def __repr__(self):
         return "<Attendance {}, {}, {}>".format(self.student, self.component, self.date)
+

@@ -43,7 +43,7 @@ def view_courses(subject, catalog, name=None):
 
     # Get when attendance was last recorded for a course component.
     attendance_last = db.session.query(Course, CourseComponent, Attendance) \
-        .with_entities(Course.name, CourseComponent.name, func.max(Attendance.date)) \
+        .with_entities(Course.name, CourseComponent.name, func.max(Attendance.timestamp)) \
         .join(Attendance.component, CourseComponent.course) \
         .filter(Course.subject_id == subject).filter(Course.catalog_id == catalog) \
         .group_by(CourseComponent.id).order_by(CourseComponent.name).all()
@@ -56,10 +56,10 @@ def view_courses(subject, catalog, name=None):
     # Get when attendance was last recorded for a course component since the beginning
     # of last weekday.
     attendance_last_week = db.session.query(Course, CourseComponent, Attendance) \
-        .with_entities(Course.name, CourseComponent.name, func.max(Attendance.date)) \
+        .with_entities(Course.name, CourseComponent.name, func.max(Attendance.timestamp)) \
         .join(Attendance.component, CourseComponent.course) \
         .filter(Course.subject_id == subject).filter(Course.catalog_id == catalog) \
-        .filter(Attendance.date >= start_of_last_weekday) \
+        .filter(Attendance.timestamp >= start_of_last_weekday) \
         .group_by(CourseComponent.id).order_by(CourseComponent.name).all()
 
     # Get info about subject and department names.
