@@ -57,7 +57,8 @@ def load_user(user_id):
 @login.route('/login', methods=['GET', 'POST'])
 def handle_login():
     if request.method == 'POST':
-        print(request.form)
+        user = User(username)
+
         username = request.form['username']
         password = request.form['password']
 
@@ -67,9 +68,8 @@ def handle_login():
             error = "Wrong username or password."
         
         if not result:
-                return render_template("login.html", error=error), 401
+            return render_template("login.html", error=error), 401
         
-        user = User(username)
         login_user(user)
 
         n = request.args.get("next")
