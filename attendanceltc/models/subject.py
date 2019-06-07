@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 class Subject(db.Model):
     __tablename__ = 'subject'
 
-    id = Column(String(150), primary_key=True, auto_increment=True)
+    id = Column(String(150), primary_key=True)
     name = Column(String(150), nullable=False)
     department_id = Column(Integer, ForeignKey('department.id'), nullable=False)
 

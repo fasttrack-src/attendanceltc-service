@@ -12,14 +12,23 @@ from attendanceltc.models.coursecomponent import CourseComponent
 from attendanceltc.models.student import Student
 from attendanceltc.models.enrollment import Enrollment
 from attendanceltc.models.attendance import Attendance
+from attendanceltc.models.administrative_staff_user import AdministrativeStaffUser 
 
 db.init_app(app)
 
+departments = {
+    "mathsstats" : Department(name="School of Mathematics and Statistics"),
+    "compsci" : Department(name = "School of Computing Science")
+}
+
+
+def create_users():
+    ange = AdministrativeStaffUser(username="adamk",
+        department=departments["mathsstats"],
+        )
+    db.session.add(ange)
+
 def create_mock_departments():
-    departments = {
-        "mathsstats" : Department(name="School of Mathematics and Statistics"),
-        "compsci" : Department(name = "School of Computing Science")
-    }
 
     subjects = {
         "maths" : Subject(id="MATHS", name="Mathematics", department=departments["mathsstats"]),
@@ -35,7 +44,7 @@ def create_mock_school():
     s = requests.Session()
 
     # Try logging in with admin credentials.
-    r = s.post("http://localhost/phone-api/login", json={"guid": "admin", "password": "p"})
+    r = s.post("http://localhost:8080/phone-api/login", json={"guid": "admin", "password": "admin"})
     print(r.text)
 
     # Open file and try importing.
@@ -43,13 +52,13 @@ def create_mock_school():
 
         headers = {'Content-Type': 'text/csv'}
         params = {"uploadType": "MATHS_STATS_CSV_1"}
-        r = s.post("http://localhost/students", data=f, headers=headers, params=params)
+        r = s.post("http://localhost:8080/students", data=f, headers=headers, params=params)
         print(r.text)
 
 def create_mock_attendance():
     cc = db.session.query(CourseComponent).filter(CourseComponent.name == "LB01").filter(CourseComponent.course.has(Course.name == "Mathematics 1R")).first()
     st = db.session.query(Student).filter(Student.enrollment.any(Enrollment.component == cc)).first()
-    
+
     att = Attendance(student=st, component=cc)
     db.session.add(att)
 
@@ -67,12 +76,15 @@ with app.app_context():
     db.create_all()
 
     create_mock_departments()
+    create_users()
+
     db.session.commit()
 
     create_mock_school()
     
     create_mock_attendance()
+
     db.session.commit()
 
-    print("Population script run.")
+    print("Population script finished running.")
     print("="*80)

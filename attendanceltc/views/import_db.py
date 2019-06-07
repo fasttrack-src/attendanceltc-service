@@ -16,6 +16,7 @@ from attendanceltc.models.coursecomponent import CourseComponent
 from attendanceltc.models.student import Student
 from attendanceltc.models.enrollment import Enrollment
 from attendanceltc.models.subject import Subject
+from attendanceltc.models.administrative_staff_user import AdministrativeStaffUser
 from attendanceltc.models.department import Department
 
 from .shared import APIResponseMaker

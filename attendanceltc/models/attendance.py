@@ -9,7 +9,7 @@ class Attendance(db.Model):
     __tablename__ = 'attendance'
     __table_args__ = (UniqueConstraint('student_id', 'coursecomponent_id', 'timestamp'), )
     
-    id = Column(Integer, primary_key=True, auto_increment=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     student_id = Column(Integer, ForeignKey('student.id'), nullable=False)
     coursecomponent_id = Column(Integer, ForeignKey('coursecomponent.id'), nullable=False)
     timestamp = Column(DateTime, default=datetime.datetime.now, nullable=False)
