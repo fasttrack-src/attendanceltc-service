@@ -12,11 +12,6 @@ class UserIdentity(db.Model):
 # This is some magic we need to automatically update UserIdentity's identity dictionary.
 @event.listens_for(UserIdentity, 'mapper_configured')
 def receive_mapper_configured(mapper, class_):
-    print("UPDATE!!!!!")
-    print(mapper)
-    print("MAP:")
-    print(mapper.polymorphic_map)
-    print("")
     class FallbackToParentPolymorphicMap(dict):
         def __missing__(self, key):
             # return parent UserIdentity mapper for undefined polymorphic_identity

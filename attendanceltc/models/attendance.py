@@ -12,9 +12,12 @@ class Attendance(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     student_id = Column(Integer, ForeignKey('student.id'), nullable=False)
     coursecomponent_id = Column(Integer, ForeignKey('coursecomponent.id'), nullable=False)
+    marker_id = Column(String, ForeignKey(
+        'user_identity.username'))
     timestamp = Column(DateTime, default=datetime.datetime.now, nullable=False)
 
     student = relationship("Student", back_populates="attendance")
+    marker = relationship("UserIdentity")
     component = relationship("CourseComponent", back_populates="attendance")
 
     def __str__(self):

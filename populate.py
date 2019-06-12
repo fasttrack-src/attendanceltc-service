@@ -1,100 +1,182 @@
 import sys
+import time
 import datetime
 import requests
+import os
+import os.path
 
-from attendanceltc import app
-from attendanceltc.models.shared import db
 
-from attendanceltc.models.subject import Subject
-from attendanceltc.models.department import Department
-from attendanceltc.models.course import Course
-from attendanceltc.models.coursecomponent import CourseComponent
-from attendanceltc.models.student import Student
-from attendanceltc.models.enrollment import Enrollment
-from attendanceltc.models.attendance import Attendance
-from attendanceltc.models.administrative_staff_user import AdministrativeStaffUser
-from attendanceltc.models.non_ad_user import NonADUser
-from attendanceltc.models.tutor import Tutor
+class PopulationScript:
+    def check_database_exists():
+        if not os.path.isfile("attendanceltc.sqlite"):
+            return True
 
-db.init_app(app)
+        print("An SQLite database already exists in this project.")
+        print("For the population script to run, the SQLite")
+        print("database needs to be in a clean state, otherwise data may be lost or")
+        print("an exception may be thrown. Choose among the following:")
+        print("")
+        print(
+            "[d]elete the current database, create a clean database and run the script")
+        print(
+            "[b]ackup the current database, create a clean database and run the script")
+        print('[k]eep the current database and run the population script')
+        print("select one of these options (d/B/k), ctrl+c to quit:")
 
-departments = {
-    "mathsstats" : Department(name="School of Mathematics and Statistics"),
-    "compsci" : Department(name = "School of Computing Science")
-}
+        try:
+            option = input("> ")
+        except KeyboardInterrupt:
+            print("\nQuitting....")
+            return False
 
-def create_users():
-    DEFAULT_PASSWORD = "05a58397e0acdcc134046c673b3f074c20af49d71c79b350dd8764771122c7b2"
+        if option == "d" or option == "delete":
+            try:
+                os.remove("./attendanceltc.sqlite")
+            except:
+                return False
 
-    users = {
-        "adminstaff": AdministrativeStaffUser(username="adminstaff", department=departments["mathsstats"]),
-        "adminaccount": NonADUser(username="adminaccount", password=DEFAULT_PASSWORD, admin_account=True),
-        "serviceaccount": NonADUser(username="serviceaccount", password=DEFAULT_PASSWORD, service_account=True),
-        "tutor": Tutor(username="adamk", firstname="Adam", lastname="Kurkiewicz", email="adam.kurkiewicz@research.gla.ac.uk")
-    }
+            return True
+        elif option == "k" or option == "keep":
+            return True
+        else:
+            path = "./attendanceltc-{}.sqlite.bk".format(int(time.time()))
+            print("Backing up old database as", path)
 
-    db.session.add_all(users.values())
+            try:
+                os.rename("./attendanceltc.sqlite", path)
+            except:
+                print("Could not back up file, original kept.")
+                return False
 
-def create_mock_departments():
-    subjects = {
-        "maths" : Subject(id="MATHS", name="Mathematics", department=departments["mathsstats"]),
-        "stats" : Subject(id="STATS", name="Statistics", department=departments["mathsstats"]),
-        "compsci" : Subject(id="COMPSCI", name="Computing Science", department=departments["compsci"])
-    }
+            return True
 
-    db.session.add_all(departments.values())
-    db.session.add_all(subjects.values())
+    def create_database(self):
+        from attendanceltc.models.course import Course
+        from attendanceltc.models.coursecomponent import CourseComponent
+        from attendanceltc.models.student import Student
+        from attendanceltc.models.enrollment import Enrollment
+        from attendanceltc.models.attendance import Attendance
+        from attendanceltc.models.administrative_staff_user import AdministrativeStaffUser
+        from attendanceltc.models.non_ad_user import NonADUser
+        from attendanceltc.models.tutor import Tutor
 
-"""
-def create_mock_school():
-    # Create session for cookie persistency.
-    s = requests.Session()
+        self.db.create_all()
 
-    # Try logging in with admin credentials.
-    r = s.post("http://localhost:8080/phone-api/login", json={"guid": "admin", "password": "admin"})
-    print(r.text)
+        print("Created database with all relevant models.")
 
-    # Open file and try importing.
-    with open('anonymize/anonymized.csv', 'rb') as f:
+    def create_departments(self):
+        from attendanceltc.models.department import Department
 
-        headers = {'Content-Type': 'text/csv'}
-        params = {"uploadType": "MATHS_STATS_CSV_1"}
-        r = s.post("http://localhost:8080/students", data=f, headers=headers, params=params)
-        print(r.text)
+        self.departments = {
+            "mathsstats": Department(name="School of Mathematics and Statistics"),
+            "compsci": Department(name="School of Computing Science")
+        }
 
-def create_mock_attendance():
-    cc = db.session.query(CourseComponent).filter(CourseComponent.name == "LB01").filter(CourseComponent.course.has(Course.name == "Mathematics 1R")).first()
-    st = db.session.query(Student).filter(Student.enrollment.any(Enrollment.component == cc)).first()
+        print("Created", len(self.departments),
+              "mock departments, adding to database session...")
+        self.db.session.add_all(self.departments.values())
+        self.db.session.commit()
 
-    att = Attendance(student=st, component=cc)
-    db.session.add(att)
+    def create_subjects(self):
+        from attendanceltc.models.subject import Subject
 
-    today = datetime.date.today()
-    start_of_last_weekday = datetime.timedelta(days=today.weekday(), weeks=1)
-    start_of_last_weekday = today - start_of_last_weekday
+        self.subjects = {
+            "maths": Subject(id="MATHS", name="Mathematics", department=self.departments["mathsstats"]),
+            "stats": Subject(id="STATS", name="Statistics", department=self.departments["mathsstats"]),
+            "compsci": Subject(id="COMPSCI", name="Computing Science", department=self.departments["compsci"])
+        }
 
-    att2 = Attendance(student=st, component=cc, timestamp=start_of_last_weekday)
-    db.session.add(att2)
-"""
+        print("Created", len(self.subjects),
+              "mock subjects, adding to database session...")
+        self.db.session.add_all(self.subjects.values())
+        self.db.session.commit()
 
-with app.app_context():
-    print("="*80)
-    print("Running population script...")
-    
-    db.create_all()
+    def create_users(self):
+        from attendanceltc.models.administrative_staff_user import AdministrativeStaffUser
+        from attendanceltc.models.non_ad_user import NonADUser
+        from attendanceltc.models.tutor import Tutor
 
-    create_mock_departments()
-    create_users()
+        DEFAULT_PASSWORD = "05a58397e0acdcc134046c673b3f074c20af49d71c79b350dd8764771122c7b2"
 
-    db.session.commit()
+        self.users = {
+            "adminstaff": AdministrativeStaffUser(username="adminstaff", department=self.departments["mathsstats"]),
+            "adminaccount": NonADUser(username="adminaccount", password=DEFAULT_PASSWORD, admin_account=True),
+            "serviceaccount": NonADUser(username="serviceaccount", password=DEFAULT_PASSWORD, service_account=True),
+            "tutor": Tutor(username="adamk", firstname="Adam", lastname="Kurkiewicz", email="adam.kurkiewicz@research.gla.ac.uk")
+        }
 
-    """
-    create_mock_school()
-    
-    #create_mock_attendance()
+        print("Created", len(self.users),
+              "mock users, adding to database session...")
+        self.db.session.add_all(self.users.values())
+        self.db.session.commit()
 
-    db.session.commit()
-    """
+    def populate_with_anonymized(self):
+        from attendanceltc.views.import_db import import_mycampus_feed
+        from attendanceltc.views.shared import APIResponseMaker
 
-    print("Population script finished running.")
-    print("="*80)
+        print("Importing anonymized MyCampus data, this may take a while...")
+
+        with open('anonymize/anonymized-short.csv', 'rb') as f, self.app.test_request_context('/student', data=f) as c:
+            c.g.resp = APIResponseMaker()
+            import_mycampus_feed()
+
+        print("MyCampus data imported.")
+
+    def create_attendance(self):
+        from attendanceltc.models.user_identity import UserIdentity
+        from attendanceltc.models.course import Course
+        from attendanceltc.models.coursecomponent import CourseComponent
+        from attendanceltc.models.student import Student
+        from attendanceltc.models.enrollment import Enrollment
+        from attendanceltc.models.attendance import Attendance
+
+        cc = self.db.session.query(CourseComponent).filter(CourseComponent.name == "LB01").filter(
+            CourseComponent.course.has(Course.name == "Mathematics 1R")).first()
+        st = self.db.session.query(Student).filter(
+            Student.enrollment.any(Enrollment.component == cc)).first()
+
+        t = self.users["tutor"]
+
+        print("Adding attendance to student", st,
+              "for course component", cc, " marked by user", t)
+
+        att = Attendance(student=st, component=cc, marker=t)
+        self.db.session.add(att)
+
+        today = datetime.date.today()
+        start_of_last_weekday = datetime.timedelta(days=today.weekday(), weeks=1)
+        start_of_last_weekday = today - start_of_last_weekday
+
+        att = Attendance(student=st, component=cc, marker=t, timestamp=start_of_last_weekday)
+        self.db.session.add(att)
+        
+        print("Attendance data added, committing to database...")
+        self.db.session.commit()
+
+    def __init__(self):
+        res = PopulationScript.check_database_exists()
+
+        if not res:
+            return
+
+        # Now do the basic app imports
+        from attendanceltc import app
+        from attendanceltc.models.shared import db
+
+        self.db = db
+        self.app = app
+
+        with self.app.app_context():
+            print("="*80)
+
+            self.create_database()
+            self.create_departments()
+            self.create_subjects()
+            self.create_users()
+            self.populate_with_anonymized()
+            self.create_attendance()
+
+            print("="*80)
+
+
+p = PopulationScript()
