@@ -12,7 +12,9 @@ from attendanceltc.models.coursecomponent import CourseComponent
 from attendanceltc.models.student import Student
 from attendanceltc.models.enrollment import Enrollment
 from attendanceltc.models.attendance import Attendance
-from attendanceltc.models.administrative_staff_user import AdministrativeStaffUser 
+from attendanceltc.models.administrative_staff_user import AdministrativeStaffUser
+from attendanceltc.models.non_ad_user import NonADUser
+from attendanceltc.models.tutor import Tutor
 
 db.init_app(app)
 
@@ -21,15 +23,19 @@ departments = {
     "compsci" : Department(name = "School of Computing Science")
 }
 
-
 def create_users():
-    ange = AdministrativeStaffUser(username="adamk",
-        department=departments["mathsstats"],
-        )
-    db.session.add(ange)
+    DEFAULT_PASSWORD = "05a58397e0acdcc134046c673b3f074c20af49d71c79b350dd8764771122c7b2"
+
+    users = {
+        "adminstaff": AdministrativeStaffUser(username="adminstaff", department=departments["mathsstats"]),
+        "adminaccount": NonADUser(username="adminaccount", password=DEFAULT_PASSWORD, admin_account=True),
+        "serviceaccount": NonADUser(username="serviceaccount", password=DEFAULT_PASSWORD, service_account=True),
+        "tutor": Tutor(username="adamk", firstname="Adam", lastname="Kurkiewicz", email="adam.kurkiewicz@research.gla.ac.uk")
+    }
+
+    db.session.add_all(users.values())
 
 def create_mock_departments():
-
     subjects = {
         "maths" : Subject(id="MATHS", name="Mathematics", department=departments["mathsstats"]),
         "stats" : Subject(id="STATS", name="Statistics", department=departments["mathsstats"]),
@@ -39,6 +45,7 @@ def create_mock_departments():
     db.session.add_all(departments.values())
     db.session.add_all(subjects.values())
 
+"""
 def create_mock_school():
     # Create session for cookie persistency.
     s = requests.Session()
@@ -68,6 +75,7 @@ def create_mock_attendance():
 
     att2 = Attendance(student=st, component=cc, timestamp=start_of_last_weekday)
     db.session.add(att2)
+"""
 
 with app.app_context():
     print("="*80)
@@ -80,11 +88,13 @@ with app.app_context():
 
     db.session.commit()
 
+    """
     create_mock_school()
     
-    create_mock_attendance()
+    #create_mock_attendance()
 
     db.session.commit()
+    """
 
     print("Population script finished running.")
     print("="*80)

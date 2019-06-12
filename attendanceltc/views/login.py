@@ -9,18 +9,25 @@ from flask import current_app as app
 from flask import Blueprint, request, abort, redirect, render_template
 from flask_login import LoginManager, login_user, logout_user, login_required
 
+from sqlalchemy.orm import class_mapper
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+
+from attendanceltc.models.shared import db
 from attendanceltc.models.user import User
 
 from .shared import APIResponseMaker
-
-from attendanceltc.models.shared import db
-
-from attendanceltc.models.administrative_staff_user import AdministrativeStaffUser
 
 login = Blueprint('login', __name__)
 
 login_manager = LoginManager()
 login_manager.login_view = "login.handle_login"
+
+def hash_password(password):
+        dk = hashlib.pbkdf2_hmac('sha256', password.encode(
+            "utf-8"), b'attendance.gla.ac.uk', 1000)
+        hashed_password = binascii.hexlify(dk).decode()
+
+        return hashed_password
 
 def authenticate_with_ldap(username, password):
     try:
@@ -36,43 +43,63 @@ def authenticate_with_ldap(username, password):
     except ldap.UNWILLING_TO_PERFORM as e:
         return False, "Empty password provided or other error {}".format(e)
 
-
 def authenticate(username, password):
-        # Check if admin user:
-        #   check password, with config file, log in
-        # Check if non_ad user:
-        #   check password in the db, log in
-        # Check if administrative staff user
-        #   check in the db. If it's there, pull newest data from AD, fix up the record if necessary, log in.
-        # Check if tutor in the db:
-        #   pull newest data from AD, fix up the record if necessary, log in.
-        # Check if student in the db:
-        #   pull newest data from AD, fix up the record if necessary, log in.
-        # Give up
+
+    # For polymorphism to work, we must import all possible polymorphic variants of UserIdentity.
+    # This is so that the mapper can update and we can resolve individual instances from the query.
+    from attendanceltc.models.user_identity import UserIdentity
+    from attendanceltc.models.administrative_staff_user import AdministrativeStaffUser
+    from attendanceltc.models.non_ad_user import NonADUser
+    from attendanceltc.models.tutor import Tutor
+    
+    # First, we assert that the username must be alphanumeric and less than 32 characters.
+    if not re.match("^[a-zA-Z0-9]*$", username) and len(username) < 32:
+        return False, "Invalid username format (must be alphanumeric characters only and at most 31 chars)."
+    
+    # Debug account, we need to check against our config to see if the password matches.
     if username == "admin":
-        dk = hashlib.pbkdf2_hmac('sha256', password.encode(
-            "utf-8"), b'attendance.gla.ac.uk', 1000)
-        hashed_password = binascii.hexlify(dk).decode()
+        password = hash_password(password)
         
-        if hashed_password == app.config["ADMIN_PASSWORD"]:
+        if password == app.config["ADMIN_PASSWORD"]:
             return True, ""
         else:
-            return False, "Invalid administrator credentials."
-
-
-    elif re.match("^[a-zA-z]*$", username) and len(username) < 32:
-        no_admin_users = len(list(db.session.query(AdministrativeStaffUser).filter(AdministrativeStaffUser.username == username)))
-
-        if no_admin_users > 1:
-            return False, "Internal error, too many users named {}".format(username)
-
-        is_admin_user = no_admin_users == 1
-
-        if is_admin_user:
-            # TODO would be nice to update the database record if any changes in ldap
-            return authenticate_with_ldap(username, password)
+            return False, "Invalid debug account credentials."
     
-    return False, "Inavlid username"
+    # Try fetching an identity with the correct username. If there are too many, this is definitely an error
+    # and it should be reported. If there are none, we can try just authenticating with LDAP and assign
+    # the least amount of permission (i.e. student) if it succeeds.
+    try:
+        identity = db.session.query(UserIdentity).filter(UserIdentity.username == username).one()
+    except MultipleResultsFound:
+        return False, "There are more than one users named {}".format(username)
+    except NoResultFound:
+
+        success, _ = authenticate_with_ldap(username, password)
+
+        if success:
+            return True, ""
+        else:
+            return False, "No user named {}".format(username)
+
+    # If the identity has a password component, we will hash the password given and match it up to the password
+    # stored in the database. If not, we will authenticate with LDAP, fix the record, and log in.
+    if hasattr(identity, "password"):
+        password = hash_password(password)
+
+        if identity.password == password:
+            return identity, ""
+        else:
+            return False, "Invalid password given for username {}".format(username)
+    else:
+        # TODO: would be nice to update the database record if any changes to ldap
+        success, message = authenticate_with_ldap(username, password)
+
+        if success:
+            return identity, ""
+        else:
+            return success, message
+    
+    return False, "Unspecified error"
         
         
 def is_safe_url(target):
@@ -96,6 +123,8 @@ def handle_login():
 
         result, error = authenticate(username, password)
         
+        # If we are running in production, we will mask the error message
+        # presented to the user for security.
         if not app.debug:
             error = "Wrong username or password."
         
