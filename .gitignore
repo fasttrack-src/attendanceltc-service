@@ -1,6 +1,10 @@
 *.csv
 !anonymized.csv
+!anonymized-short.csv
+
 *.sqlite
+*.bk
+
 __pycache__/
 *.pyc
 venv
