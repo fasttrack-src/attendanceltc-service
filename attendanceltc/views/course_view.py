@@ -6,14 +6,7 @@ from flask_login import login_required
 
 from sqlalchemy import func
 
-from attendanceltc.models.shared import db
-from attendanceltc.models.subject import Subject
-from attendanceltc.models.department import Department
-from attendanceltc.models.course import Course
-from attendanceltc.models.coursecomponent import CourseComponent
-from attendanceltc.models.student import Student
-from attendanceltc.models.enrollment import Enrollment
-from attendanceltc.models.attendance import Attendance
+from attendanceltc.models import db, Subject, Department, Course, CourseComponent, Student, Enrollment, Attendance
 
 school_course_view = Blueprint('school_course_view', __name__)
 
@@ -74,7 +67,7 @@ def view_courses(subject, catalog, name=None):
         .with_entities(func.count(func.distinct(Student.id))) \
         .join(Student.enrollment, Enrollment.component, CourseComponent.course) \
         .filter(Course.subject_id == subject).filter(Course.catalog_id == catalog) \
-        .first()
+        .one()
     
     # Get how many tier 4 students are enrolled per component.
     tier4_count, = db.session.query(Student) \
@@ -82,7 +75,7 @@ def view_courses(subject, catalog, name=None):
         .join(Student.enrollment, Enrollment.component, CourseComponent.course) \
         .filter(Course.subject_id == subject).filter(Course.catalog_id == catalog) \
         .filter(Student.tier4) \
-        .first()
+        .one()
 
     # Fill out context dictionary and render page.
     result = OrderedDict()

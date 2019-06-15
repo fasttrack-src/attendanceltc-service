@@ -9,6 +9,7 @@ class Department(db.Model):
     name = Column(String(150), nullable=False)
 
     subjects = relationship("Subject", back_populates="department")
+    sessions = relationship("Session", back_populates="department")
     administrative_staff = relationship("AdministrativeStaffUser", back_populates="department")
 
     def __str__(self):

@@ -45,20 +45,13 @@ class PopulationScript:
             try:
                 os.rename("./attendanceltc.sqlite", path)
             except:
-                print("Could not back up file, original kept.")
+                print("Could not back up file.")
                 return False
 
             return True
 
     def create_database(self):
-        from attendanceltc.models.course import Course
-        from attendanceltc.models.coursecomponent import CourseComponent
-        from attendanceltc.models.student import Student
-        from attendanceltc.models.enrollment import Enrollment
-        from attendanceltc.models.attendance import Attendance
-        from attendanceltc.models.administrative_staff_user import AdministrativeStaffUser
-        from attendanceltc.models.non_ad_user import NonADUser
-        from attendanceltc.models.tutor import Tutor
+        import attendanceltc.models
 
         self.db.create_all()
 
@@ -76,6 +69,29 @@ class PopulationScript:
               "mock departments, adding to database session...")
         self.db.session.add_all(self.departments.values())
         self.db.session.commit()
+
+    def create_sessions(self):
+        from attendanceltc.models.session import Session
+        from attendanceltc.models.checkpoint import Checkpoint
+
+        self.sessions = {
+            "summer": Session(name="Summer School 2018-2019",
+                              department=self.departments["mathsstats"],
+                              start=datetime.datetime(2019, 6, 1),
+                              end=datetime.datetime(2019, 8, 31))
+        }
+
+        self.checkpoints = {
+            "june": Checkpoint(session=self.sessions["summer"], date=datetime.datetime(2019, 7, 1)),
+            "july": Checkpoint(session=self.sessions["summer"], date=datetime.datetime(2019, 8, 1))
+        }
+
+        print("Created sample session and checkpoints, adding to database...")
+
+        self.db.session.add_all(self.sessions.values())
+        self.db.session.add_all(self.checkpoints.values())
+        self.db.session.commit()
+
 
     def create_subjects(self):
         from attendanceltc.models.subject import Subject
@@ -144,12 +160,14 @@ class PopulationScript:
         self.db.session.add(att)
 
         today = datetime.date.today()
-        start_of_last_weekday = datetime.timedelta(days=today.weekday(), weeks=1)
+        start_of_last_weekday = datetime.timedelta(
+            days=today.weekday(), weeks=1)
         start_of_last_weekday = today - start_of_last_weekday
 
-        att = Attendance(student=st, component=cc, marker=t, timestamp=start_of_last_weekday)
+        att = Attendance(student=st, component=cc, marker=t,
+                         timestamp=start_of_last_weekday)
         self.db.session.add(att)
-        
+
         print("Attendance data added, committing to database...")
         self.db.session.commit()
 
@@ -161,7 +179,7 @@ class PopulationScript:
 
         # Now do the basic app imports
         from attendanceltc import app
-        from attendanceltc.models.shared import db
+        from attendanceltc.models import db
 
         self.db = db
         self.app = app
@@ -171,6 +189,7 @@ class PopulationScript:
 
             self.create_database()
             self.create_departments()
+            self.create_sessions()
             self.create_subjects()
             self.create_users()
             self.populate_with_anonymized()
