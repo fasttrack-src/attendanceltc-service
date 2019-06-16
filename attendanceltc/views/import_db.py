@@ -11,13 +11,7 @@ from sqlalchemy.sql import functions
 from sqlalchemy.sql.expression import Tuple
 
 from attendanceltc.models.shared import db, get_one_or_create
-from attendanceltc.models.course import Course
-from attendanceltc.models.coursecomponent import CourseComponent
-from attendanceltc.models.student import Student
-from attendanceltc.models.enrollment import Enrollment
-from attendanceltc.models.subject import Subject
-from attendanceltc.models.administrative_staff_user import AdministrativeStaffUser
-from attendanceltc.models.department import Department
+from attendanceltc.models import Course, CourseComponent, Student, Enrollment, Subject, AdministrativeStaffUser, Department
 
 from .shared import APIResponseMaker
 

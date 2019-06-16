@@ -2,14 +2,10 @@ from flask import Flask, jsonify
 
 from flask_login import UserMixin
 
-from .models.shared import db
-from .models.user import User
+import attendanceltc.models
 
-from .views.login import login, login_manager
-from .views.import_db import import_db
-from .views.school_admin_view import school_admin_view
-from .views.course_view import school_course_view
-from .views.app_api import app_api
+from attendanceltc.models import db
+from attendanceltc.views import login, login_manager, import_db, school_admin_view, school_course_view, app_api
 
 app = Flask(__name__)
 

@@ -24,5 +24,5 @@ class Attendance(db.Model):
         return "(Attendance of {} for component {}, recorded at {})".format(self.student, self.component, self.date)
     
     def __repr__(self):
-        return "<Attendance {}, {}, {}>".format(self.student, self.component, self.date)
+        return "<Attendance {}, {}, {}>".format(self.student, self.component, self.timestamp)
 

@@ -12,8 +12,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required
 from sqlalchemy.orm import class_mapper
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-from attendanceltc.models.shared import db
-from attendanceltc.models.user import User
+from attendanceltc.models import db, User
 
 from .shared import APIResponseMaker
 
