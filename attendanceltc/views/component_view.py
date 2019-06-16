@@ -1,3 +1,7 @@
+import datetime
+import math
+from collections import OrderedDict
+
 from flask import Blueprint, jsonify, request, render_template, abort
 from flask_login import login_required
 
@@ -11,13 +15,16 @@ from attendanceltc.models.coursecomponent import CourseComponent
 from attendanceltc.models.student import Student
 from attendanceltc.models.enrollment import Enrollment
 from attendanceltc.models.attendance import Attendance
+from attendanceltc.models.session import Session
 
 school_component_view = Blueprint('school_component_view', __name__)
 
-@school_component_view.route('/<component>/<subject_id>/<catalog_id>', methods=["GET"])
+
+@school_component_view.route('/component/<component>/<subject_id>/<catalog_id>', methods=["GET"])
 @login_required
 def view_attendance_for_component(component, subject_id, catalog_id):
 
+    # get all students that are enrolled for that component_id
     students = db.session.query(Student).join(Enrollment, CourseComponent) \
         .filter(CourseComponent.name == component) \
         .filter(Course.subject_id == subject_id) \
@@ -26,11 +33,33 @@ def view_attendance_for_component(component, subject_id, catalog_id):
         .filter(Enrollment.student_id == Student.id) \
         .all()
 
-    print(students)
-    print(len(students))
+    tier4_students = [s for s in students if s.tier4]
 
-    # get the number of all students that are enrolled for that component_id
-    
-    # get the same number for tier 4
+    attendance = db.session.query(Attendance) \
+        .with_entities(Attendance.timestamp) \
+        .filter(Attendance.student_id.in_((s.id for s in students))) \
+        .all()
 
-    return "Iva was here and changed the component name"
+    # we assume that the semester started 5 weeks ago and is 14 weeks long
+    today = datetime.datetime.now()
+    start_of_semester = today - datetime.timedelta(days=today.weekday(), weeks=5)
+    session = db.session.query(Session).first()
+    raw_weeks, week_labels = session.get_weeks_and_labels()
+    weekly_attendance_count = [0]*len(raw_weeks)
+
+    for a in attendance:
+        ts = a.timestamp
+        for i in range(0, len(raw_weeks)):
+            if raw_weeks[i][0] > ts and raw_weeks[i][1] < ts:
+                weekly_attendance_count[i] += 1
+                break
+
+    print(weekly_attendance_count)
+
+    context = {
+        "all_students_count": len(students),
+        "tier4_students_count": len(tier4_students),
+        "weekly_attendance": weekly_attendance_count
+    }
+
+    return render_template("component_view.html", **context)

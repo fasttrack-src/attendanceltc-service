@@ -80,6 +80,8 @@ def view_courses(subject, catalog, name=None):
     # Fill out context dictionary and render page.
     result = OrderedDict()
 
+    print(attendance_last)
+
     for _, component, count in course_count:
         result[component] = [count, 0, "never", "not taken"]
 
@@ -91,6 +93,9 @@ def view_courses(subject, catalog, name=None):
 
     for _, component, date in attendance_last_week:
         result[component][3] = date.strftime("%a, %x")
+
+    print("*******")
+    print(result)
 
     context = {"name": course_count[0][0], "components": result, "subject_id": subject, "catalog_id": catalog,
                "subject_name": subject_name, "department_name": department_name, "students_count": students_count,

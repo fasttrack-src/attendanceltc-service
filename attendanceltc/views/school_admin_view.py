@@ -69,4 +69,8 @@ def view_course():
 
         result[(subject_id, catalog_id, course_name)][-1] = tier4_count
 
+    print("++++++++", attendance_per_week)
+    print("******", week_labels)
+    print("--------- ", raw_weeks[0][0])
+
     return render_template("school_admin_view.html", courses=result, weeks=week_labels, attendance_per_week=attendance_per_week)
