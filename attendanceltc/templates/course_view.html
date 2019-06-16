@@ -28,7 +28,7 @@
 	<tbody>
 		{% for component, (count, count_tier4, last_date, last_week_date) in components.items() %}
 		<tr>
-			<td id="{{ component }}-id">{{ component }}</td>
+			<td id="{{ component }}-id"><a href="/{{ component }}/{{ subject_id }}/{{catalog_id}}">{{ component }}</a></td>
 			<td id="{{ component }}-tutor"></td>
 			<td id="{{ component }}-students">{{ count }} ({{count_tier4}})</td>
 			<td id="{{ component }}-last-taken">{{ last_date }} <em>({{last_week_date}} within the last week)</em></td>
