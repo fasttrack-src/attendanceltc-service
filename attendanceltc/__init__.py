@@ -5,7 +5,7 @@ from flask_login import UserMixin
 import attendanceltc.models
 
 from attendanceltc.models import db
-from attendanceltc.views import login, login_manager, import_db, school_admin_view, school_course_view, app_api
+from attendanceltc.views import login, login_manager, import_db, school_admin_view, school_course_view, app_api, school_component_view
 
 app = Flask(__name__)
 
@@ -27,6 +27,7 @@ app.register_blueprint(import_db)
 app.register_blueprint(school_admin_view)
 app.register_blueprint(school_course_view)
 app.register_blueprint(app_api)
+app.register_blueprint(school_component_view)
 
 @app.errorhandler(404)
 def not_found(error):
