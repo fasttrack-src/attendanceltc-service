@@ -40,26 +40,20 @@ def view_attendance_for_component(component, subject_id, catalog_id):
         .filter(Attendance.student_id.in_((s.id for s in students))) \
         .all()
 
-    # we assume that the semester started 5 weeks ago and is 14 weeks long
-    today = datetime.datetime.now()
-    start_of_semester = today - datetime.timedelta(days=today.weekday(), weeks=5)
     session = db.session.query(Session).first()
     raw_weeks, week_labels = session.get_weeks_and_labels()
     weekly_attendance_count = [0]*len(raw_weeks)
 
     for a in attendance:
         ts = a.timestamp
+        print("&&&", ts)
         for i in range(0, len(raw_weeks)):
-            if raw_weeks[i][0] > ts and raw_weeks[i][1] < ts:
+            if raw_weeks[i][0] <= ts and raw_weeks[i][1] >= ts:
                 weekly_attendance_count[i] += 1
+                print(ts, "yes", raw_weeks[i][0], raw_weeks[i][1])
                 break
 
     print(weekly_attendance_count)
 
-    context = {
-        "all_students_count": len(students),
-        "tier4_students_count": len(tier4_students),
-        "weekly_attendance": weekly_attendance_count
-    }
 
-    return render_template("component_view.html", **context)
+    return render_template("component_view.html", weeks=week_labels, attendance_per_week=weekly_attendance_count)
